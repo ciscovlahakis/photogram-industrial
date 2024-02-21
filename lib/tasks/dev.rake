@@ -1,6 +1,6 @@
 desc "Fill the database tables with some sample data"
-task({ :sample_data => :environment }) do
-  p "Creating sample data"
+task sample_data: :environment do
+  puts "Creating sample data"
 
   if Rails.env.development?
     FollowRequest.destroy_all
@@ -12,49 +12,39 @@ task({ :sample_data => :environment }) do
 
   12.times do
     name = Faker::Name.first_name
-    User.create(
-      email: "#{name}@example.com",
+    u = User.create(
+      email: "#{name.downcase}@example.com",
       password: "password",
       username: name,
       private: [true, false].sample,
     )
 
-    p u.errors.full_messages
+    puts u.errors.full_messages unless u.persisted?
   end
 
-  p "There are now #{User.count} users."
+  puts "There are now #{User.count} users."
 
-  users = User.all
-
-  users.each do |first_user|
-    users.each do |second_user|
-      next if first_user == second_user
+  User.all.each do |first_user|
+    User.where.not(id: first_user.id).each do |second_user|
       if rand < 0.75
         first_user.sent_follow_requests.create(
           recipient: second_user,
           status: FollowRequest.statuses.keys.sample
         )
       end
-
-      if rand < 0.75
-        second_user.sent_follow_requests.create(
-          recipient: first_user,
-          status: FollowRequest.statuses.keys.sample
-        )
-      end
     end
   end
 
-  users.each do |user|
-    rand(15).times do
+  User.all.each do |user|
+    rand(1..15).times do
       photo = user.own_photos.create(
         caption: Faker::Quote.jack_handey,
         image: "https://robohash.org/#{rand(9999)}"
       )
 
       user.followers.each do |follower|
-        if rand < 0.5 && !photo.fans.include?(follower)
-          photo.fans << follower
+        if rand < 0.5
+          photo.likes.create(fan: follower)
         end
 
         if rand < 0.25
@@ -66,9 +56,11 @@ task({ :sample_data => :environment }) do
       end
     end
   end
-  p "There are now #{User.count} users."
-  p "There are now #{FollowRequest.count} follow requests."
-  p "There are now #{Photo.count} photos."
-  p "There are now #{Like.count} likes."
-  p "There are now #{Comment.count} comments."
+
+  puts "Sample data creation complete."
+  puts "There are now #{User.count} users."
+  puts "There are now #{FollowRequest.count} follow requests."
+  puts "There are now #{Photo.count} photos."
+  puts "There are now #{Like.count} likes."
+  puts "There are now #{Comment.count} comments."
 end
