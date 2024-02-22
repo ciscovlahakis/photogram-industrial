@@ -4,15 +4,15 @@
 #
 #  id                     :bigint           not null, primary key
 #  comments_count         :integer          default(0)
-#  email                  :string           default(""), not null
+#  email                  :citext           default(""), not null
 #  encrypted_password     :string           default(""), not null
 #  likes_count            :integer          default(0)
-#  photos_count           :integer
-#  private                :boolean
+#  photos_count           :integer          default(0)
+#  private                :boolean          default(TRUE)
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
-#  username               :string
+#  username               :citext
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
@@ -27,9 +27,9 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-         
+
   has_many :own_photos, class_name: "Photo", foreign_key: "owner_id"
-  has_many :comments, foreign_key: :author_id
+  has_many :comments, foreign_key: "author_id"
   has_many :sent_follow_requests, foreign_key: :sender_id, class_name: "FollowRequest"
   has_many :accepted_sent_follow_requests, -> { accepted }, foreign_key: :sender_id, class_name: "FollowRequest"
   has_many :received_follow_requests, foreign_key: :recipient_id, class_name: "FollowRequest"
