@@ -1,0 +1,16 @@
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <%= link_to "Posts", user_path(@user.username), class: current_page?(action: "show") ? "nav-link active" : "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link_to "Liked photos", liked_path(@user.username), class: current_page?(action: "liked") ? "nav-link active" : "nav-link" %>
+  <li class="nav-item">
+    <%= link_to "Feed",feed_path(@user.username), class: current_page?(action: "feed") ? "nav-link active" : "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link_to "Followers",followers_path(@user.username), class: current_page?(action: "followers") ? "nav-link active" : "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link_to "Following",following_path(@user.username), class: current_page?(action: "following") ? "nav-link active" : "nav-link" %>
+  </li>
+</ul>
